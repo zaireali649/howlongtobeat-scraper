@@ -117,4 +117,4 @@ def scrape_bulk(start_id: int = 1,
 
 
 if __name__ == "__main__":
-    scrape_bulk(max_consecutive_404s=10000)
+    scrape_bulk(max_consecutive_404s=1000)
