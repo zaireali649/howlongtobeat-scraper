@@ -101,6 +101,9 @@ def scrape_bulk(start_id: int = 1,
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=4)
             print(f"Saved progress: {len(results)} games collected (Latest ID: {game_id})")
+            print(f"Starting scraping from game ID {game_id} (Max consecutive 404s: {max_consecutive_404s})")
+        elif game_id % save_frequency == 0:
+            print(f"Starting scraping from game ID {game_id} (Max consecutive 404s: {max_consecutive_404s})")
 
     print(f"Stopped after {max_consecutive_404s} consecutive 404s.")
 
