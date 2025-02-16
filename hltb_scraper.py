@@ -61,12 +61,16 @@ def scrape_hltb_game(game_id: int, max_retries: int = 3, cooldown_time: int = 60
     return None
 
 
-def scrape_bulk(start_id: int = 1, max_consecutive_404s: int = 500, server_break: float = 0.01,
+def scrape_bulk(start_id: int = 1,
+                save_frequency: int = 100,
+                max_consecutive_404s: int = 500,
+                server_break: float = 0.01,
                 output_file: str = "hltb_data.json") -> None:
     """Scrapes game data iterating over game IDs and saves the collected data in a JSON file.
 
     Args:
         start_id (int, optional): The starting game ID. Defaults to 1.
+        save_frequency (int, optional): Number of links to attempt before saving. Defaults to 100.
         max_consecutive_404s (int, optional): Number of consecutive 404s before stopping. Defaults to 500.
         server_break (float, optional): Delay in seconds between requests to prevent rate limiting. Defaults to 0.01.
         output_file (str, optional): File path for saving the scraped data. Defaults to 'hltb_data.json'.
@@ -92,16 +96,21 @@ def scrape_bulk(start_id: int = 1, max_consecutive_404s: int = 500, server_break
         game_id += 1
         time.sleep(server_break)  # Respect the server to avoid getting blocked
 
-        # Save progress every 100 games to prevent data loss
-        if game_id % 100 == 0:
+        # Save progress every save_frequency games to prevent data loss
+        if game_id % save_frequency == 0 and consecutive_404s < save_frequency:
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=4)
             print(f"Saved progress: {len(results)} games collected (Latest ID: {game_id})")
 
     print(f"Stopped after {max_consecutive_404s} consecutive 404s.")
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=4)
-    print(f"Final dataset saved: {len(results)} games in {output_file}")
+
+    if consecutive_404s <= save_frequency:
+        # Ensure the last chunk of data is saved if the total games scraped
+        # since the last save is less than the save_frequency.
+        # This prevents data loss if the script stops before hitting another save checkpoint.
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=4)
+        print(f"Final dataset saved: {len(results)} games in {output_file}")
 
 
 if __name__ == "__main__":
