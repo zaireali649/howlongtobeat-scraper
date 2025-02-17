@@ -11,8 +11,6 @@ import pandas as pd
 import time
 from typing import Optional, Dict, List, Any
 
-BASE_URL = "https://howlongtobeat.com/game/"
-
 
 def scrape_hltb_game(game_id: int, max_retries: int = 3, cooldown_time: int = 60) -> Optional[Dict[str, Any]]:
     """Fetch game data from HowLongToBeat using a given game ID.
@@ -25,6 +23,8 @@ def scrape_hltb_game(game_id: int, max_retries: int = 3, cooldown_time: int = 60
     Returns:
         Optional[Dict[str, Any]]: A dictionary containing game data, or None if the game does not exist.
     """
+    BASE_URL = "https://howlongtobeat.com/game/"
+
     url = f"{BASE_URL}{game_id}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -117,35 +117,41 @@ def scrape_bulk(start_id: int = 1,
         print(f"Final dataset saved: {len(results)} games in {output_file}")
 
 
-def flatten_hltb_json(json_list):
+def flatten_hltb_json(json_list: List[Dict[str, Any]]) -> pd.DataFrame:
+    """Flattens a list of JSON objects obtained by scraping HowLongToBeat.com and outputs a dataframe.
+
+    Parameters:
+    json_list (List[Dict[str, Any]]): A list of dictionaries where each dictionary
+                                      represents a JSON object containing 'game',
+                                      'platformData', and 'userReviews' keys.
+
+    Returns:
+    pd.DataFrame: A flattened DataFrame with prefixed column names for each category
+                  (e.g., 'game_', 'platform_', 'review_').
     """
-    Efficiently flattens a list of JSON objects and normalizes nested lists and dicts.
-    """
-    # Normalize 'game' list in one step
+    # Extract and flatten the 'game' list, if available
     game_df = pd.json_normalize(
-        [item for obj in json_list for item in obj.get("game", [])]
+        [item for obj in json_list for item in obj.get("game", [])]  # Extract each 'game' entry
     )
+    game_df.columns = [f"game_{col}" for col in game_df.columns]  # Prefix column names with 'game_'
 
-    game_df.columns = [f"game_{col}" for col in game_df.columns]
-
-    # Normalize 'platformData' list in one step
+    # Extract and flatten the 'platformData' list, if available
     platform_df = pd.json_normalize(
-        [item for obj in json_list for item in obj.get("platformData", [])]
+        [item for obj in json_list for item in obj.get("platformData", [])]  # Extract each 'platformData' entry
     )
+    platform_df.columns = [f"platform_{col}" for col in platform_df.columns]  # Prefix column names with 'platform_'
 
-    platform_df.columns = [f"platform_{col}" for col in platform_df.columns]
-
-    # Normalize 'userReviews' dictionary in one step
+    # Extract and flatten the 'userReviews' dictionary, if available
     user_reviews_df = pd.json_normalize(
-        [obj.get("userReviews", {}) for obj in json_list]
+        [obj.get("userReviews", {}) for obj in json_list]  # Extract 'userReviews' as a dictionary
     )
+    user_reviews_df.columns = [f"review_{col}" for col in user_reviews_df.columns]  # Prefix column names with 'review_'
 
-    user_reviews_df.columns = [f"review_{col}" for col in user_reviews_df.columns]
-
-    # Merge all data on index
+    # Concatenate all DataFrames along columns (axis=1) to form a single unified DataFrame
     combined_df = pd.concat([game_df, platform_df, user_reviews_df], axis=1)
 
-    return combined_df
+    return combined_df  # Return the flattened DataFrame
+
 
 if __name__ == "__main__":
     scrape_bulk(max_consecutive_404s=1000)
