@@ -146,10 +146,11 @@ To automate these checks, consider adding **pre-commit hooks**.
 
 ## 📊 CSV Output Example
 
-| game_id | game_name                | profile_platform | profile_genre  | profile_dev  | profile_pub      | release_world | review_score | comp_main | comp_plus | comp_100 | review_count |
-|---------|--------------------------|------------------|----------------|--------------|------------------|---------------|--------------|-----------|-----------|-----------|--------------|
-| 1       | 688(I) Hunter/Killer     | PC              | Simulation     | Sonalysts    | Electronic Arts  | 1997-07-04    | 0            | 42553     | 193015    | 97200     | 0            |
-| 2       | Beyond Good & Evil 2     | Xbox 360        | Action         | Ubisoft Montpellier | Ubisoft | 0000-00-00 | 100          | 28148     | 33243     | 67611     | 0            |
+| game_game_id | game_game_name       | profile_platform | game_profile_genre | game_profile_dev    | game_profile_pub        | game_release_world | game_review_score | platform_comp_main | platform_comp_plus | platform_comp_100 | review_review_count |
+|--------------|----------------------|------------------|--------------------|---------------------|-------------------------|--------------------|-------------------|--------------------|--------------------|-------------------|---------------------|
+| 1            | 688(I) Hunter/Killer | PC               | Simulation         | Sonalysts           | Electronic Arts         | 1997-07-04         | 0                 | 42553              | 193015             | 97200             | 0                   |
+| 2            | Beyond Good & Evil 2 |                  | Action, Adventure  | Ubisoft Montpellier | Ubisoft                 | 0000-00-00         | 100               | 28148              | 33243              | 67611             | 0                   |
+| 3            | 'Splosion Man        | Xbox 360         | Action             | Ubisoft Montpellier | Microsoft Games Studios | 2009-07-22         | 74                | 22680              | 0                  | 0                 | 79                  |
 
 ---
 
