@@ -4,7 +4,7 @@
 This repository contains a Python scraper for extracting game data from [HowLongToBeat](https://howlongtobeat.com).  
 The scraper retrieves **playtime estimates**, **genres**, **platforms**, **developers**, **publishers**, and more.
 
-🔹 **Dataset Available on Kaggle**: [🔗 (Insert Kaggle link here)]  
+🔹 **Dataset Available on Kaggle**: [🔗 (https://www.kaggle.com/datasets/zaireali/howlongtobeat-games-scraper-2162025)]  
 🔹 **Scraper Code**: This repo provides the code to scrape fresh data.
 
 ## 📂 Features
@@ -155,7 +155,7 @@ To automate these checks, consider adding **pre-commit hooks**.
 ---
 
 ## 🔗 Related Links
-- **📊 Dataset on Kaggle**: [🔗 (Insert Kaggle link here)]  
+- **📊 Dataset on Kaggle**: [🔗 (https://www.kaggle.com/datasets/zaireali/howlongtobeat-games-scraper-2162025)]  
 - **🌐 HowLongToBeat Website**: [🔗 howlongtobeat.com](https://howlongtobeat.com)  
 
 ---
