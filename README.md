@@ -14,6 +14,7 @@ The scraper retrieves **playtime estimates**, **genres**, **platforms**, **devel
 ✅ Implements **rate limiting & retries** to avoid API bans  
 ✅ Stops automatically when **no more valid games exist**  
 ✅ Efficient error handling and automatic cooldown on request failures  
+✅ Converts **nested JSON fields** into structured CSV format for analysis  
 
 ---
 
@@ -46,15 +47,16 @@ ensuring it stops when there are no more valid game IDs.
 - Saves progress **every 100 games** to prevent data loss.
 
 ### Convert JSON to CSV
-After scraping, you can convert the dataset to CSV format:
+After scraping, you can convert the dataset to CSV format while **flattening nested fields**:
 ```python
-import pandas as pd
-import json
+input_file = "hltb_data.json"
 
-with open("hltb_data.json", "r") as f:
+# Load the first JSON file
+with open(input_file, "r") as f:
     data = json.load(f)
 
-df = pd.DataFrame(data)
+df = flatten_hltb_json(data)
+
 df.to_csv("hltb_data.csv", index=False)
 ```
 
@@ -105,22 +107,49 @@ To automate these checks, consider adding **pre-commit hooks**.
 ## 📊 Example Data Output
 ```json
 {
-    "game_id": 104683,
-    "title": "Pokémon Scarlet and Violet",
-    "platform": "Nintendo Switch",
-    "genre": "Role-Playing, Open World",
-    "developer": "Game Freak",
-    "publisher": "Nintendo, The Pokémon Company",
-    "release_date": "2022-11-18",
-    "review_score": 72,
-    "playtimes": {
-        "Main Story": "32 Hours",
-        "Main + Extra": "49.5 Hours",
-        "Completionist": "87 Hours"
+    "game": [
+        {
+            "game_id": 1,
+            "game_name": "688(I) Hunter/Killer",
+            "profile_platform": "PC",
+            "profile_genre": "Simulation",
+            "profile_dev": "Sonalysts",
+            "profile_pub": "Electronic Arts",
+            "release_world": "1997-07-04",
+            "review_score": 0,
+            "playtimes": {
+                "Main Story": "37.4 Hours",
+                "Main + Extra": "87.06 Hours",
+                "Completionist": "166.25 Hours"
+            },
+            "summary": "A realistic submarine simulation developed by Sonalysts."
+        }
+    ],
+    "userReviews": {
+        "review_count": 0
     },
-    "summary": "The Pokémon Scarlet and Pokémon Violet games, the newest chapters in the Pokémon series..."
+    "platformData": [
+        {
+            "platform": "PC",
+            "count_comp": 10,
+            "comp_main": 42553,
+            "comp_plus": 193015,
+            "comp_100": 97200,
+            "comp_low": 27262,
+            "comp_high": 435044
+        }
+    ]
 }
 ```
+
+---
+
+## 📊 CSV Output Example
+
+| game_id | game_name                | profile_platform | profile_genre  | profile_dev  | profile_pub      | release_world | review_score | comp_main | comp_plus | comp_100 | review_count |
+|---------|--------------------------|------------------|----------------|--------------|------------------|---------------|--------------|-----------|-----------|-----------|--------------|
+| 1       | 688(I) Hunter/Killer     | PC              | Simulation     | Sonalysts    | Electronic Arts  | 1997-07-04    | 0            | 42553     | 193015    | 97200     | 0            |
+| 2       | Beyond Good & Evil 2     | Xbox 360        | Action         | Ubisoft Montpellier | Ubisoft | 0000-00-00 | 100          | 28148     | 33243     | 67611     | 0            |
 
 ---
 
