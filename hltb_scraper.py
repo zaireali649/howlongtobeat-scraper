@@ -7,6 +7,7 @@ and automatic stopping after a set number of consecutive 404 responses.
 
 import requests
 import json
+import pandas as pd
 import time
 from typing import Optional, Dict, List, Any
 
@@ -116,5 +117,45 @@ def scrape_bulk(start_id: int = 1,
         print(f"Final dataset saved: {len(results)} games in {output_file}")
 
 
+def flatten_hltb_json(json_list):
+    """
+    Efficiently flattens a list of JSON objects and normalizes nested lists and dicts.
+    """
+    # Normalize 'game' list in one step
+    game_df = pd.json_normalize(
+        [item for obj in json_list for item in obj.get("game", [])]
+    )
+
+    game_df.columns = [f"game_{col}" for col in game_df.columns]
+
+    # Normalize 'platformData' list in one step
+    platform_df = pd.json_normalize(
+        [item for obj in json_list for item in obj.get("platformData", [])]
+    )
+
+    platform_df.columns = [f"platform_{col}" for col in platform_df.columns]
+
+    # Normalize 'userReviews' dictionary in one step
+    user_reviews_df = pd.json_normalize(
+        [obj.get("userReviews", {}) for obj in json_list]
+    )
+
+    user_reviews_df.columns = [f"review_{col}" for col in user_reviews_df.columns]
+
+    # Merge all data on index
+    combined_df = pd.concat([game_df, platform_df, user_reviews_df], axis=1)
+
+    return combined_df
+
 if __name__ == "__main__":
     scrape_bulk(max_consecutive_404s=1000)
+
+    input_file = "raw_data/hltb_data.json"
+
+    # Load the first JSON file
+    with open(input_file, "r") as f:
+        data = json.load(f)
+
+    df = flatten_hltb_json(data)
+
+    df.to_csv("raw_data/hltb_data.csv", index=False)
